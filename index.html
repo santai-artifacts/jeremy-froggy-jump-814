@@ -217,7 +217,29 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 36px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .lily-pad::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle at 30% 30%, #FFB6C1, #FF69B4);
+            border-radius: 50%;
+            top: 15px;
+            left: 15px;
+        }
+
+        .lily-pad::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle at 30% 30%, #FFB6C1, #FF69B4);
+            border-radius: 50%;
+            top: 15px;
+            right: 15px;
         }
 
 
@@ -445,7 +467,6 @@
             for (let i = 0; i < 6; i++) {
                 const lilyPad = document.createElement('div');
                 lilyPad.className = 'lily-pad';
-                lilyPad.textContent = '🌺';
                 lilyPad.style.top = (80 + Math.random() * 300) + 'px';
                 lilyPad.style.left = (Math.random() * 80 + 10) + '%';
                 lilyPad.addEventListener('click', () => makeJump(lilyPad));
@@ -479,7 +500,6 @@
             for (let i = 0; i < 3; i++) {
                 const obstacle = document.createElement('div');
                 obstacle.className = 'obstacle';
-                obstacle.textContent = '💣';
                 obstacle.style.width = '50px';
                 obstacle.style.height = '50px';
                 obstacle.style.top = (100 + Math.random() * 300) + 'px';
