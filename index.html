@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Froggy Jump</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .game-area {
+            position: relative;
+            width: 90%;
+            max-width: 600px;
+            height: 500px;
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 50%, #90EE90 50%, #228B22 100%);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            border: 4px solid #fff;
+        }
+
+        .ground {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 50%;
+            background: linear-gradient(to bottom, #90EE90, #228B22);
+            opacity: 0.9;
+        }
+
+        .water {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 50%;
+            background: linear-gradient(180deg,
+                #4a90a4 0%,
+                #2d6a7b 25%,
+                #1f4d5c 50%,
+                #2d6a7b 75%,
+                #4a90a4 100%);
+            overflow: hidden;
+        }
+
+        .water::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            background:
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 10px,
+                    rgba(255, 255, 255, 0.1) 10px,
+                    rgba(255, 255, 255, 0.1) 20px
+                ),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 5px,
+                    rgba(255, 255, 255, 0.05) 5px,
+                    rgba(255, 255, 255, 0.05) 10px
+                );
+            animation: wave 8s linear infinite;
+        }
+
+        .water::after {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            background:
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 15px,
+                    rgba(255, 255, 255, 0.08) 15px,
+                    rgba(255, 255, 255, 0.08) 30px
+                );
+            animation: wave 12s linear infinite reverse;
+            opacity: 0.5;
+        }
+
+        @keyframes wave {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(50%);
+            }
+        }
+
+        .frog {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 55px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            user-select: none;
+            z-index: 10;
+        }
+
+        .frog-body {
+            position: absolute;
+            width: 55px;
+            height: 45px;
+            background: radial-gradient(circle at 35% 30%, #5FEE5F, #1a8a1a);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            left: 7.5px;
+            top: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), inset -2px -2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .frog-belly {
+            position: absolute;
+            width: 35px;
+            height: 28px;
+            background: #7FFF7F;
+            border-radius: 50%;
+            left: 17.5px;
+            top: 12px;
+            opacity: 0.8;
+        }
+
+        .frog-eye {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: #fff;
+            border-radius: 50%;
+            top: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .frog-eye:nth-child(3) {
+            left: 12px;
+        }
+
+        .frog-eye:nth-child(4) {
+            right: 12px;
+        }
+
+        .frog-pupil {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #000;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+        }
+
+        .frog-leg {
+            position: absolute;
+            background: #2a7a2a;
+            border-radius: 50%;
+        }
+
+        .frog-leg-back {
+            width: 16px;
+            height: 12px;
+            bottom: 2px;
+        }
+
+        .frog-leg-back:nth-child(5) {
+            left: 8px;
+        }
+
+        .frog-leg-back:nth-child(6) {
+            right: 8px;
+        }
+
+        .frog-leg-front {
+            width: 12px;
+            height: 10px;
+            bottom: 5px;
+        }
+
+        .frog-leg-front:nth-child(7) {
+            left: 14px;
+        }
+
+        .frog-leg-front:nth-child(8) {
+            right: 14px;
+        }
+
+        .frog.jumping {
+            animation: jump 0.6s ease-out;
+        }
+
+        @keyframes jump {
+            0% {
+                bottom: 80px;
+                transform: translateX(-50%) scaleY(0.95);
+            }
+            50% {
+                bottom: 280px;
+                transform: translateX(-50%) scaleY(0.85);
+            }
+            100% {
+                bottom: 80px;
+                transform: translateX(-50%) scaleY(0.95);
+            }
+        }
+
+        .lily-pad {
+            position: absolute;
+            width: 80px;
+            height: 70px;
+            background: radial-gradient(ellipse at 30% 30%, #90EE90, #228B22);
+            border-radius: 50%;
+            border: 3px solid #1a6b1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+
+
+        .score {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #fff;
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+        }
+
+        .instructions {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .jump-counter {
+            position: absolute;
+            top: 70px;
+            left: 20px;
+            color: #fff;
+            font-size: 18px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .lily-pad {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .lily-pad:hover {
+            transform: scale(1.1);
+        }
+
+        .obstacle {
+            position: absolute;
+            background: radial-gradient(circle at 30% 30%, #333, #000);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5), inset -2px -2px 4px rgba(0, 0, 0, 0.5);
+            animation: float 2s ease-in-out infinite;
+        }
+
+        .obstacle::before {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 12px;
+            background: #8B4513;
+            top: -8px;
+            border-radius: 2px;
+        }
+
+        .obstacle::after {
+            content: '';
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #FFD700;
+            border-radius: 50%;
+            top: -6px;
+            box-shadow: 0 0 4px #FFD700;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .game-status {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 30px 50px;
+            border-radius: 15px;
+            font-size: 24px;
+            text-align: center;
+            z-index: 100;
+            display: none;
+        }
+
+        .game-status.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="game-area">
+            <div class="water"></div>
+            <div class="ground"></div>
+            <div class="score">Froggy</div>
+            <div class="jump-counter">Jumps: <span id="jumpCount">0</span></div>
+            <div class="frog" id="frog">
+                <div class="frog-body">
+                    <div class="frog-belly"></div>
+                    <div class="frog-eye"><div class="frog-pupil"></div></div>
+                    <div class="frog-eye"><div class="frog-pupil"></div></div>
+                </div>
+                <div class="frog-leg frog-leg-back"></div>
+                <div class="frog-leg frog-leg-back"></div>
+                <div class="frog-leg frog-leg-front"></div>
+                <div class="frog-leg frog-leg-front"></div>
+            </div>
+            <div class="game-status" id="gameStatus"></div>
+            <div class="instructions">Click lily pads to jump! Avoid the red obstacles!</div>
+        </div>
+    </div>
+
+    <script>
+        const frog = document.getElementById('frog');
+        const jumpCountDisplay = document.getElementById('jumpCount');
+        const gameArea = document.querySelector('.game-area');
+        const gameStatus = document.getElementById('gameStatus');
+
+        let jumpCount = 0;
+        let isJumping = false;
+        let gameActive = true;
+        let targetX = null;
+        let targetY = null;
+
+        // Audio context for sound effects
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(freq, duration) {
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+
+            osc.frequency.value = freq;
+            osc.type = 'sine';
+
+            gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+
+            osc.start(audioContext.currentTime);
+            osc.stop(audioContext.currentTime + duration);
+        }
+
+        function jumpSound() {
+            playSound(400, 0.1);
+        }
+
+        function collisionSound() {
+            playSound(200, 0.3);
+        }
+
+        function makeJump(targetElement = null) {
+            if (isJumping || !gameActive) return;
+
+            isJumping = true;
+            jumpCount++;
+            jumpCountDisplay.textContent = jumpCount;
+            jumpSound();
+
+            if (targetElement) {
+                const rect = targetElement.getBoundingClientRect();
+                const gameRect = gameArea.getBoundingClientRect();
+                targetX = rect.left - gameRect.left + rect.width / 2;
+                targetY = rect.top - gameRect.top + rect.height / 2;
+            }
+
+            frog.classList.add('jumping');
+
+            setTimeout(() => {
+                if (targetElement) {
+                    frog.style.left = targetX + 'px';
+                    frog.style.bottom = 'auto';
+                    frog.style.top = targetY - 30 + 'px';
+                }
+                frog.classList.remove('jumping');
+                isJumping = false;
+
+                checkCollisions();
+            }, 600);
+        }
+
+        function checkCollisions() {
+            const frogRect = frog.getBoundingClientRect();
+            const obstacles = gameArea.querySelectorAll('.obstacle');
+
+            for (let obstacle of obstacles) {
+                const obstacleRect = obstacle.getBoundingClientRect();
+                if (frogRect.left < obstacleRect.right &&
+                    frogRect.right > obstacleRect.left &&
+                    frogRect.top < obstacleRect.bottom &&
+                    frogRect.bottom > obstacleRect.top) {
+                    endGame();
+                    return;
+                }
+            }
+        }
+
+        function endGame() {
+            gameActive = false;
+            collisionSound();
+            gameStatus.textContent = `Game Over!\nJumps: ${jumpCount}\nClick to restart`;
+            gameStatus.classList.add('show');
+        }
+
+        function restart() {
+            gameActive = true;
+            jumpCount = 0;
+            jumpCountDisplay.textContent = 0;
+            frog.style.left = '50%';
+            frog.style.bottom = '80px';
+            frog.style.top = 'auto';
+            frog.style.transform = 'translateX(-50%)';
+            gameStatus.classList.remove('show');
+            gameArea.querySelectorAll('.obstacle').forEach(o => o.remove());
+            spawnObstacles();
+        }
+
+        function spawnObstacles() {
+            for (let i = 0; i < 3; i++) {
+                const obstacle = document.createElement('div');
+                obstacle.className = 'obstacle';
+                obstacle.style.width = '50px';
+                obstacle.style.height = '50px';
+                obstacle.style.top = (100 + Math.random() * 200) + 'px';
+                obstacle.style.left = (Math.random() * 80 + 10) + '%';
+                gameArea.appendChild(obstacle);
+            }
+        }
+
+        // Lily pads
+        for (let i = 0; i < 5; i++) {
+            const lilyPad = document.createElement('div');
+            lilyPad.className = 'lily-pad';
+            lilyPad.style.top = (80 + Math.random() * 150) + 'px';
+            lilyPad.style.left = (Math.random() * 80 + 10) + '%';
+            lilyPad.addEventListener('click', () => makeJump(lilyPad));
+            gameArea.appendChild(lilyPad);
+        }
+
+        frog.addEventListener('click', () => makeJump());
+        gameStatus.addEventListener('click', restart);
+
+        spawnObstacles();
+    </script>
+</body>
+</html>
