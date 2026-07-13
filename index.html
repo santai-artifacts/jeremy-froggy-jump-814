@@ -471,9 +471,9 @@
                 for (let i = 0; i < 3; i++) {
                     const pad = document.createElement('div');
                     pad.className = 'lily-pad';
-                    const minY = worldY + VIEWPORT_HEIGHT + (i * 100);
+                    const minY = worldY + VIEWPORT_HEIGHT * 0.3 + (i * 120);
                     pad.style.top = minY + 'px';
-                    pad.style.left = (Math.random() * 70 + 15) + '%';
+                    pad.style.left = (Math.random() * 60 + 20) + '%';
                     pad.addEventListener('click', () => makeJump(pad));
                     gameWorld.appendChild(pad);
                 }
@@ -505,7 +505,17 @@
             gameWorld.querySelectorAll('.obstacle').forEach(o => o.remove());
             gameWorld.querySelectorAll('.lily-pad').forEach(p => p.remove());
             updateCamera(0);
-            generateNewLilyPads();
+
+            // Generate initial lily pads in visible area
+            for (let i = 0; i < 8; i++) {
+                const pad = document.createElement('div');
+                pad.className = 'lily-pad';
+                pad.style.top = (100 + i * 120) + 'px';
+                pad.style.left = (Math.random() * 60 + 20) + '%';
+                pad.addEventListener('click', () => makeJump(pad));
+                gameWorld.appendChild(pad);
+            }
+
             generateNewObstacles();
         }
 
