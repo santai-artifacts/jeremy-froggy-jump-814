@@ -58,53 +58,37 @@
             overflow: hidden;
         }
 
-        .water::before {
-            content: '';
+        .ripple {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background:
-                radial-gradient(circle at 25% 50%, rgba(150, 220, 255, 0.6) 0%, transparent 35%),
-                radial-gradient(circle at 75% 30%, rgba(100, 200, 255, 0.5) 0%, transparent 35%),
-                radial-gradient(circle at 50% 80%, rgba(120, 210, 255, 0.5) 0%, transparent 35%);
-            animation: ripple1 4s ease-in-out infinite;
+            border: 2px solid rgba(100, 200, 255, 0.6);
+            border-radius: 50%;
+            pointer-events: none;
         }
 
-        .water::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background:
-                radial-gradient(circle at 40% 70%, rgba(100, 190, 255, 0.5) 0%, transparent 40%),
-                radial-gradient(circle at 80% 50%, rgba(80, 170, 240, 0.5) 0%, transparent 40%),
-                radial-gradient(circle at 20% 20%, rgba(110, 200, 255, 0.5) 0%, transparent 40%);
-            animation: ripple2 5s ease-in-out infinite;
+        .ripple.ripple1 {
+            animation: expandRipple 2s ease-out infinite;
         }
 
-        @keyframes ripple1 {
-            0%, 100% {
-                opacity: 0.3;
-                transform: scale(0.8);
-            }
-            50% {
-                opacity: 0.8;
-                transform: scale(1.2);
-            }
+        .ripple.ripple2 {
+            animation: expandRipple 2s ease-out infinite;
+            animation-delay: 0.6s;
         }
 
-        @keyframes ripple2 {
-            0%, 100% {
-                opacity: 0.3;
-                transform: scale(0.9);
+        .ripple.ripple3 {
+            animation: expandRipple 2s ease-out infinite;
+            animation-delay: 1.2s;
+        }
+
+        @keyframes expandRipple {
+            0% {
+                width: 20px;
+                height: 20px;
+                opacity: 1;
             }
-            50% {
-                opacity: 0.7;
-                transform: scale(1.1);
+            100% {
+                width: 250px;
+                height: 250px;
+                opacity: 0;
             }
         }
 
@@ -362,7 +346,11 @@
 <body>
     <div class="container">
         <div class="game-area">
-            <div class="water"></div>
+            <div class="water">
+                <div class="ripple ripple1" style="top: 30%; left: 20%;"></div>
+                <div class="ripple ripple2" style="top: 50%; left: 70%;"></div>
+                <div class="ripple ripple3" style="top: 20%; left: 60%;"></div>
+            </div>
             <div class="score">Froggy</div>
             <div class="jump-counter">Jumps: <span id="jumpCount">0</span></div>
             <div class="frog" id="frog">
