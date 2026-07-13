@@ -37,25 +37,33 @@
             width: 90%;
             max-width: 600px;
             height: 500px;
-            background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 50%, #90EE90 50%, #228B22 100%);
+            background: #1a1a1a;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             overflow: hidden;
             border: 4px solid #fff;
         }
 
+        .game-world {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+
         .water {
             position: absolute;
             top: 0;
-            width: 100%;
-            height: 100%;
+            left: 0;
+            width: 200%;
+            height: 200%;
             background: linear-gradient(180deg,
                 #4a90a4 0%,
                 #2d6a7b 25%,
                 #1f4d5c 50%,
                 #2d6a7b 75%,
                 #4a90a4 100%);
-            overflow: hidden;
+            overflow: visible;
         }
 
         .ripple {
@@ -93,13 +101,16 @@
         }
 
         .frog {
-            position: absolute;
+            position: fixed;
             width: 70px;
             height: 55px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             cursor: pointer;
             transition: all 0.1s ease;
             user-select: none;
-            z-index: 10;
+            z-index: 20;
         }
 
         .frog-body {
@@ -192,16 +203,13 @@
 
         @keyframes jump {
             0% {
-                bottom: 80px;
-                transform: translateX(-50%) scaleY(0.95);
+                transform: translate(-50%, -50%) scaleY(0.95);
             }
             50% {
-                bottom: 280px;
-                transform: translateX(-50%) scaleY(0.85);
+                transform: translate(-50%, -50%) scaleY(0.85);
             }
             100% {
-                bottom: 80px;
-                transform: translateX(-50%) scaleY(0.95);
+                transform: translate(-50%, -50%) scaleY(0.95);
             }
         }
 
@@ -216,6 +224,12 @@
             align-items: center;
             justify-content: center;
             box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .lily-pad:hover {
+            transform: scale(1.1);
         }
 
         .lily-pad::before {
@@ -272,14 +286,6 @@
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
 
-        .lily-pad {
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-
-        .lily-pad:hover {
-            transform: scale(1.1);
-        }
 
         .obstacle {
             position: absolute;
@@ -346,10 +352,12 @@
 <body>
     <div class="container">
         <div class="game-area">
-            <div class="water">
-                <div class="ripple ripple1" style="top: 30%; left: 20%;"></div>
-                <div class="ripple ripple2" style="top: 50%; left: 70%;"></div>
-                <div class="ripple ripple3" style="top: 20%; left: 60%;"></div>
+            <div class="game-world" id="gameWorld">
+                <div class="water" id="water">
+                    <div class="ripple ripple1" style="top: 30%; left: 20%;"></div>
+                    <div class="ripple ripple2" style="top: 50%; left: 70%;"></div>
+                    <div class="ripple ripple3" style="top: 20%; left: 60%;"></div>
+                </div>
             </div>
             <div class="score">Froggy</div>
             <div class="jump-counter">Jumps: <span id="jumpCount">0</span></div>
@@ -365,38 +373,36 @@
                 <div class="frog-leg frog-leg-front"></div>
             </div>
             <div class="game-status" id="gameStatus"></div>
-            <div class="instructions">Click lily pads to jump! Avoid the red obstacles!</div>
+            <div class="instructions">Click lily pads to jump! Avoid the obstacles!</div>
         </div>
     </div>
 
     <script>
+        const gameArea = document.querySelector('.game-area');
+        const gameWorld = document.getElementById('gameWorld');
+        const water = document.getElementById('water');
         const frog = document.getElementById('frog');
         const jumpCountDisplay = document.getElementById('jumpCount');
-        const gameArea = document.querySelector('.game-area');
         const gameStatus = document.getElementById('gameStatus');
 
         let jumpCount = 0;
         let isJumping = false;
         let gameActive = true;
-        let targetX = null;
-        let targetY = null;
+        let worldY = 0;
+        const VIEWPORT_HEIGHT = 500;
+        const WORLD_WIDTH = 2000;
 
-        // Audio context for sound effects
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
         function playSound(freq, duration) {
             const osc = audioContext.createOscillator();
             const gain = audioContext.createGain();
-
             osc.connect(gain);
             gain.connect(audioContext.destination);
-
             osc.frequency.value = freq;
             osc.type = 'sine';
-
             gain.gain.setValueAtTime(0.3, audioContext.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-
             osc.start(audioContext.currentTime);
             osc.stop(audioContext.currentTime + duration);
         }
@@ -409,7 +415,12 @@
             playSound(200, 0.3);
         }
 
-        function makeJump(targetElement = null) {
+        function updateCamera(targetWorldY) {
+            worldY = Math.max(0, targetWorldY);
+            gameWorld.style.transform = `translateY(${-worldY}px)`;
+        }
+
+        function makeJump(targetElement) {
             if (isJumping || !gameActive) return;
 
             isJumping = true;
@@ -417,38 +428,30 @@
             jumpCountDisplay.textContent = jumpCount;
             jumpSound();
 
-            if (targetElement) {
-                const rect = targetElement.getBoundingClientRect();
-                const gameRect = gameArea.getBoundingClientRect();
-                targetX = rect.left - gameRect.left + rect.width / 2;
-                targetY = rect.top - gameRect.top + rect.height / 2;
-            }
-
             frog.classList.add('jumping');
 
             setTimeout(() => {
-                if (targetElement) {
-                    frog.style.left = targetX + 'px';
-                    frog.style.bottom = 'auto';
-                    frog.style.top = targetY - 30 + 'px';
-                }
+                const rect = targetElement.getBoundingClientRect();
+                const newWorldY = worldY + rect.top - VIEWPORT_HEIGHT / 2;
+                updateCamera(newWorldY);
+
                 frog.classList.remove('jumping');
                 isJumping = false;
 
                 checkCollisions();
+                generateNewLilyPads();
             }, 600);
         }
 
         function checkCollisions() {
-            const frogRect = frog.getBoundingClientRect();
-            const obstacles = gameArea.querySelectorAll('.obstacle');
+            const frogScreenY = VIEWPORT_HEIGHT / 2;
+            const obstacles = gameWorld.querySelectorAll('.obstacle');
 
             for (let obstacle of obstacles) {
-                const obstacleRect = obstacle.getBoundingClientRect();
-                if (frogRect.left < obstacleRect.right &&
-                    frogRect.right > obstacleRect.left &&
-                    frogRect.top < obstacleRect.bottom &&
-                    frogRect.bottom > obstacleRect.top) {
+                const rect = obstacle.getBoundingClientRect();
+                const obstacleWorldY = worldY + rect.top;
+                const distance = Math.abs(obstacleWorldY - (worldY + frogScreenY));
+                if (distance < 60) {
                     endGame();
                     return;
                 }
@@ -462,59 +465,57 @@
             gameStatus.classList.add('show');
         }
 
-        let lilyPads = [];
-
-        function createLilyPads() {
-            lilyPads = [];
-            for (let i = 0; i < 6; i++) {
-                const lilyPad = document.createElement('div');
-                lilyPad.className = 'lily-pad';
-                lilyPad.style.top = (80 + Math.random() * 300) + 'px';
-                lilyPad.style.left = (Math.random() * 80 + 10) + '%';
-                lilyPad.addEventListener('click', () => makeJump(lilyPad));
-                gameArea.appendChild(lilyPad);
-                lilyPads.push(lilyPad);
+        function generateNewLilyPads() {
+            const existingPads = gameWorld.querySelectorAll('.lily-pad');
+            if (existingPads.length < 15) {
+                for (let i = 0; i < 3; i++) {
+                    const pad = document.createElement('div');
+                    pad.className = 'lily-pad';
+                    const minY = worldY + VIEWPORT_HEIGHT + (i * 100);
+                    pad.style.top = minY + 'px';
+                    pad.style.left = (Math.random() * 70 + 15) + '%';
+                    pad.addEventListener('click', () => makeJump(pad));
+                    gameWorld.appendChild(pad);
+                }
             }
         }
 
-        function placeOnLilyPad(lilyPad) {
-            const rect = lilyPad.getBoundingClientRect();
-            const gameRect = gameArea.getBoundingClientRect();
-            frog.style.left = (rect.left - gameRect.left + rect.width / 2 - 35) + 'px';
-            frog.style.top = (rect.top - gameRect.top + rect.height / 2 - 27.5) + 'px';
-            frog.style.bottom = 'auto';
-            frog.style.transform = 'none';
+        function generateNewObstacles() {
+            const obstacles = gameWorld.querySelectorAll('.obstacle');
+            if (obstacles.length < 8) {
+                for (let i = 0; i < 2; i++) {
+                    const obs = document.createElement('div');
+                    obs.className = 'obstacle';
+                    obs.style.width = '50px';
+                    obs.style.height = '50px';
+                    const minY = worldY + VIEWPORT_HEIGHT + (Math.random() * 200);
+                    obs.style.top = minY + 'px';
+                    obs.style.left = (Math.random() * 70 + 15) + '%';
+                    gameWorld.appendChild(obs);
+                }
+            }
         }
 
         function restart() {
             gameActive = true;
             jumpCount = 0;
+            worldY = 0;
             jumpCountDisplay.textContent = 0;
             gameStatus.classList.remove('show');
-            gameArea.querySelectorAll('.obstacle').forEach(o => o.remove());
-            gameArea.querySelectorAll('.lily-pad').forEach(p => p.remove());
-            createLilyPads();
-            placeOnLilyPad(lilyPads[0]);
-            spawnObstacles();
+            gameWorld.querySelectorAll('.obstacle').forEach(o => o.remove());
+            gameWorld.querySelectorAll('.lily-pad').forEach(p => p.remove());
+            updateCamera(0);
+            generateNewLilyPads();
+            generateNewObstacles();
         }
 
-        function spawnObstacles() {
-            for (let i = 0; i < 3; i++) {
-                const obstacle = document.createElement('div');
-                obstacle.className = 'obstacle';
-                obstacle.style.width = '50px';
-                obstacle.style.height = '50px';
-                obstacle.style.top = (100 + Math.random() * 300) + 'px';
-                obstacle.style.left = (Math.random() * 80 + 10) + '%';
-                gameArea.appendChild(obstacle);
-            }
-        }
-
-        createLilyPads();
-        placeOnLilyPad(lilyPads[0]);
-        frog.addEventListener('click', () => makeJump());
+        restart();
         gameStatus.addEventListener('click', restart);
-        spawnObstacles();
+
+        setInterval(() => {
+            generateNewLilyPads();
+            generateNewObstacles();
+        }, 500);
     </script>
 </body>
 </html>
