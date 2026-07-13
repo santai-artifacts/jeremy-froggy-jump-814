@@ -66,39 +66,95 @@
             bottom: 80px;
             left: 50%;
             transform: translateX(-50%);
-            width: 60px;
-            height: 60px;
-            background: radial-gradient(circle at 30% 30%, #7FFF7F, #22AA22);
-            border-radius: 50%;
+            width: 70px;
+            height: 55px;
             cursor: pointer;
             transition: all 0.1s ease;
             user-select: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
-        .frog::before {
-            content: '';
+        .frog-body {
             position: absolute;
-            width: 12px;
-            height: 12px;
-            background: #000;
-            border-radius: 50%;
-            top: 18px;
-            left: 15px;
+            width: 55px;
+            height: 45px;
+            background: radial-gradient(circle at 35% 30%, #5FEE5F, #1a8a1a);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            left: 7.5px;
+            top: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), inset -2px -2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .frog::after {
-            content: '';
+        .frog-belly {
             position: absolute;
-            width: 12px;
-            height: 12px;
+            width: 35px;
+            height: 28px;
+            background: #7FFF7F;
+            border-radius: 50%;
+            left: 17.5px;
+            top: 12px;
+            opacity: 0.8;
+        }
+
+        .frog-eye {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: #fff;
+            border-radius: 50%;
+            top: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .frog-eye:nth-child(3) {
+            left: 12px;
+        }
+
+        .frog-eye:nth-child(4) {
+            right: 12px;
+        }
+
+        .frog-pupil {
+            position: absolute;
+            width: 8px;
+            height: 8px;
             background: #000;
             border-radius: 50%;
-            top: 18px;
-            right: 15px;
+            top: 3px;
+            left: 3px;
+        }
+
+        .frog-leg {
+            position: absolute;
+            background: #2a7a2a;
+            border-radius: 50%;
+        }
+
+        .frog-leg-back {
+            width: 16px;
+            height: 12px;
+            bottom: 2px;
+        }
+
+        .frog-leg-back:nth-child(5) {
+            left: 8px;
+        }
+
+        .frog-leg-back:nth-child(6) {
+            right: 8px;
+        }
+
+        .frog-leg-front {
+            width: 12px;
+            height: 10px;
+            bottom: 5px;
+        }
+
+        .frog-leg-front:nth-child(7) {
+            left: 14px;
+        }
+
+        .frog-leg-front:nth-child(8) {
+            right: 14px;
         }
 
         .frog.jumping {
@@ -221,7 +277,17 @@
             <div class="ground"></div>
             <div class="score">🐸 Froggy</div>
             <div class="jump-counter">Jumps: <span id="jumpCount">0</span></div>
-            <div class="frog" id="frog"></div>
+            <div class="frog" id="frog">
+                <div class="frog-body">
+                    <div class="frog-belly"></div>
+                    <div class="frog-eye"><div class="frog-pupil"></div></div>
+                    <div class="frog-eye"><div class="frog-pupil"></div></div>
+                </div>
+                <div class="frog-leg frog-leg-back"></div>
+                <div class="frog-leg frog-leg-back"></div>
+                <div class="frog-leg frog-leg-front"></div>
+                <div class="frog-leg frog-leg-front"></div>
+            </div>
             <div class="game-status" id="gameStatus"></div>
             <div class="instructions">Click lily pads to jump! Avoid the red obstacles!</div>
         </div>
