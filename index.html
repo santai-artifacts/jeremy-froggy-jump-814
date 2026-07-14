@@ -44,20 +44,11 @@
             border: 4px solid #fff;
         }
 
-        .ground {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 50%;
-            background: linear-gradient(to bottom, #90EE90, #228B22);
-            opacity: 0.9;
-        }
-
         .water {
             position: absolute;
             top: 0;
             width: 100%;
-            height: 50%;
+            height: 100%;
             background: linear-gradient(180deg,
                 #4a90a4 0%,
                 #2d6a7b 25%,
@@ -73,21 +64,10 @@
             width: 200%;
             height: 100%;
             background:
-                repeating-linear-gradient(
-                    90deg,
-                    transparent,
-                    transparent 10px,
-                    rgba(255, 255, 255, 0.1) 10px,
-                    rgba(255, 255, 255, 0.1) 20px
-                ),
-                repeating-linear-gradient(
-                    0deg,
-                    transparent,
-                    transparent 5px,
-                    rgba(255, 255, 255, 0.05) 5px,
-                    rgba(255, 255, 255, 0.05) 10px
-                );
-            animation: wave 8s linear infinite;
+                radial-gradient(circle at 20% 40%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 60% 20%, rgba(255, 255, 255, 0.25) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.2) 0%, transparent 50%);
+            animation: ripple 6s ease-in-out infinite;
         }
 
         .water::after {
@@ -96,31 +76,26 @@
             width: 200%;
             height: 100%;
             background:
-                repeating-linear-gradient(
-                    90deg,
-                    transparent,
-                    transparent 15px,
-                    rgba(255, 255, 255, 0.08) 15px,
-                    rgba(255, 255, 255, 0.08) 30px
-                );
-            animation: wave 12s linear infinite reverse;
-            opacity: 0.5;
+                radial-gradient(circle at 40% 60%, rgba(255, 255, 255, 0.25) 0%, transparent 60%),
+                radial-gradient(circle at 70% 40%, rgba(255, 255, 255, 0.2) 0%, transparent 60%),
+                radial-gradient(circle at 30% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
+            animation: ripple 8s ease-in-out infinite reverse;
         }
 
-        @keyframes wave {
+        @keyframes ripple {
             0% {
-                transform: translateX(0);
+                transform: scale(1) translateY(0);
+            }
+            50% {
+                transform: scale(1.1) translateY(2px);
             }
             100% {
-                transform: translateX(50%);
+                transform: scale(1) translateY(0);
             }
         }
 
         .frog {
             position: absolute;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
             width: 70px;
             height: 55px;
             cursor: pointer;
@@ -242,7 +217,47 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 36px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .flower {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+        }
+
+        .petal {
+            position: absolute;
+            width: 8px;
+            height: 12px;
+            background: radial-gradient(ellipse at center, #FF69B4, #FF1493);
+            border-radius: 50% 50% 50% 0;
+            left: 50%;
+            top: 50%;
+            transform-origin: 0 0;
+        }
+
+        .petal:nth-child(1) { transform: translate(-50%, -50%) rotate(0deg) translateY(-8px); }
+        .petal:nth-child(2) { transform: translate(-50%, -50%) rotate(60deg) translateY(-8px); }
+        .petal:nth-child(3) { transform: translate(-50%, -50%) rotate(120deg) translateY(-8px); }
+        .petal:nth-child(4) { transform: translate(-50%, -50%) rotate(180deg) translateY(-8px); }
+        .petal:nth-child(5) { transform: translate(-50%, -50%) rotate(240deg) translateY(-8px); }
+        .petal:nth-child(6) { transform: translate(-50%, -50%) rotate(300deg) translateY(-8px); }
+
+        .flower-center {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle at 30% 30%, #FFD700, #FFA500);
+            border-radius: 50%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
         }
 
 
@@ -352,7 +367,6 @@
     <div class="container">
         <div class="game-area">
             <div class="water"></div>
-            <div class="ground"></div>
             <div class="score">Froggy</div>
             <div class="jump-counter">Jumps: <span id="jumpCount">0</span></div>
             <div class="frog" id="frog">
@@ -464,16 +478,53 @@
             gameStatus.classList.add('show');
         }
 
+        let lilyPads = [];
+
+        function createLilyPads() {
+            lilyPads = [];
+            for (let i = 0; i < 6; i++) {
+                const lilyPad = document.createElement('div');
+                lilyPad.className = 'lily-pad';
+                lilyPad.style.top = (80 + Math.random() * 300) + 'px';
+                lilyPad.style.left = (Math.random() * 80 + 10) + '%';
+
+                // Create flower
+                const flower = document.createElement('div');
+                flower.className = 'flower';
+                for (let j = 0; j < 6; j++) {
+                    const petal = document.createElement('div');
+                    petal.className = 'petal';
+                    flower.appendChild(petal);
+                }
+                const center = document.createElement('div');
+                center.className = 'flower-center';
+                flower.appendChild(center);
+                lilyPad.appendChild(flower);
+
+                lilyPad.addEventListener('click', () => makeJump(lilyPad));
+                gameArea.appendChild(lilyPad);
+                lilyPads.push(lilyPad);
+            }
+        }
+
+        function placeOnLilyPad(lilyPad) {
+            const rect = lilyPad.getBoundingClientRect();
+            const gameRect = gameArea.getBoundingClientRect();
+            frog.style.left = (rect.left - gameRect.left + rect.width / 2 - 35) + 'px';
+            frog.style.top = (rect.top - gameRect.top + rect.height / 2 - 27.5) + 'px';
+            frog.style.bottom = 'auto';
+            frog.style.transform = 'none';
+        }
+
         function restart() {
             gameActive = true;
             jumpCount = 0;
             jumpCountDisplay.textContent = 0;
-            frog.style.left = '50%';
-            frog.style.bottom = '80px';
-            frog.style.top = 'auto';
-            frog.style.transform = 'translateX(-50%)';
             gameStatus.classList.remove('show');
             gameArea.querySelectorAll('.obstacle').forEach(o => o.remove());
+            gameArea.querySelectorAll('.lily-pad').forEach(p => p.remove());
+            createLilyPads();
+            placeOnLilyPad(lilyPads[0]);
             spawnObstacles();
         }
 
@@ -483,25 +534,16 @@
                 obstacle.className = 'obstacle';
                 obstacle.style.width = '50px';
                 obstacle.style.height = '50px';
-                obstacle.style.top = (100 + Math.random() * 200) + 'px';
+                obstacle.style.top = (100 + Math.random() * 300) + 'px';
                 obstacle.style.left = (Math.random() * 80 + 10) + '%';
                 gameArea.appendChild(obstacle);
             }
         }
 
-        // Lily pads
-        for (let i = 0; i < 5; i++) {
-            const lilyPad = document.createElement('div');
-            lilyPad.className = 'lily-pad';
-            lilyPad.style.top = (80 + Math.random() * 150) + 'px';
-            lilyPad.style.left = (Math.random() * 80 + 10) + '%';
-            lilyPad.addEventListener('click', () => makeJump(lilyPad));
-            gameArea.appendChild(lilyPad);
-        }
-
+        createLilyPads();
+        placeOnLilyPad(lilyPads[0]);
         frog.addEventListener('click', () => makeJump());
         gameStatus.addEventListener('click', restart);
-
         spawnObstacles();
     </script>
 </body>
