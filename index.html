@@ -37,80 +37,96 @@
             width: 90%;
             max-width: 600px;
             height: 500px;
-            background: #1a1a1a;
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 50%, #90EE90 50%, #228B22 100%);
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             overflow: hidden;
             border: 4px solid #fff;
         }
 
-        .game-world {
+        .ground {
             position: absolute;
+            bottom: 0;
             width: 100%;
-            height: 100%;
-            transition: transform 0.3s ease;
+            height: 50%;
+            background: linear-gradient(to bottom, #90EE90, #228B22);
+            opacity: 0.9;
         }
 
         .water {
             position: absolute;
             top: 0;
-            left: 0;
-            width: 200%;
-            height: 200%;
+            width: 100%;
+            height: 50%;
             background: linear-gradient(180deg,
                 #4a90a4 0%,
                 #2d6a7b 25%,
                 #1f4d5c 50%,
                 #2d6a7b 75%,
                 #4a90a4 100%);
-            overflow: visible;
+            overflow: hidden;
         }
 
-        .ripple {
+        .water::before {
+            content: '';
             position: absolute;
-            border: 2px solid rgba(100, 200, 255, 0.6);
-            border-radius: 50%;
-            pointer-events: none;
+            width: 200%;
+            height: 100%;
+            background:
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 10px,
+                    rgba(255, 255, 255, 0.1) 10px,
+                    rgba(255, 255, 255, 0.1) 20px
+                ),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 5px,
+                    rgba(255, 255, 255, 0.05) 5px,
+                    rgba(255, 255, 255, 0.05) 10px
+                );
+            animation: wave 8s linear infinite;
         }
 
-        .ripple.ripple1 {
-            animation: expandRipple 2s ease-out infinite;
+        .water::after {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            background:
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 15px,
+                    rgba(255, 255, 255, 0.08) 15px,
+                    rgba(255, 255, 255, 0.08) 30px
+                );
+            animation: wave 12s linear infinite reverse;
+            opacity: 0.5;
         }
 
-        .ripple.ripple2 {
-            animation: expandRipple 2s ease-out infinite;
-            animation-delay: 0.6s;
-        }
-
-        .ripple.ripple3 {
-            animation: expandRipple 2s ease-out infinite;
-            animation-delay: 1.2s;
-        }
-
-        @keyframes expandRipple {
+        @keyframes wave {
             0% {
-                width: 20px;
-                height: 20px;
-                opacity: 1;
+                transform: translateX(0);
             }
             100% {
-                width: 250px;
-                height: 250px;
-                opacity: 0;
+                transform: translateX(50%);
             }
         }
 
         .frog {
-            position: fixed;
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
             width: 70px;
             height: 55px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
             cursor: pointer;
             transition: all 0.1s ease;
             user-select: none;
-            z-index: 20;
+            z-index: 10;
         }
 
         .frog-body {
@@ -203,13 +219,16 @@
 
         @keyframes jump {
             0% {
-                transform: translate(-50%, -50%) scaleY(0.95);
+                bottom: 80px;
+                transform: translateX(-50%) scaleY(0.95);
             }
             50% {
-                transform: translate(-50%, -50%) scaleY(0.85);
+                bottom: 280px;
+                transform: translateX(-50%) scaleY(0.85);
             }
             100% {
-                transform: translate(-50%, -50%) scaleY(0.95);
+                bottom: 80px;
+                transform: translateX(-50%) scaleY(0.95);
             }
         }
 
@@ -223,35 +242,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-
-        .lily-pad:hover {
-            transform: scale(1.1);
-        }
-
-        .lily-pad::before {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: radial-gradient(circle at 30% 30%, #FFB6C1, #FF69B4);
-            border-radius: 50%;
-            top: 15px;
-            left: 15px;
-        }
-
-        .lily-pad::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: radial-gradient(circle at 30% 30%, #FFB6C1, #FF69B4);
-            border-radius: 50%;
-            top: 15px;
-            right: 15px;
+            font-size: 36px;
         }
 
 
@@ -286,6 +277,14 @@
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
 
+        .lily-pad {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .lily-pad:hover {
+            transform: scale(1.1);
+        }
 
         .obstacle {
             position: absolute;
@@ -352,13 +351,8 @@
 <body>
     <div class="container">
         <div class="game-area">
-            <div class="game-world" id="gameWorld">
-                <div class="water" id="water">
-                    <div class="ripple ripple1" style="top: 30%; left: 20%;"></div>
-                    <div class="ripple ripple2" style="top: 50%; left: 70%;"></div>
-                    <div class="ripple ripple3" style="top: 20%; left: 60%;"></div>
-                </div>
-            </div>
+            <div class="water"></div>
+            <div class="ground"></div>
             <div class="score">Froggy</div>
             <div class="jump-counter">Jumps: <span id="jumpCount">0</span></div>
             <div class="frog" id="frog">
@@ -373,36 +367,38 @@
                 <div class="frog-leg frog-leg-front"></div>
             </div>
             <div class="game-status" id="gameStatus"></div>
-            <div class="instructions">Click lily pads to jump! Avoid the obstacles!</div>
+            <div class="instructions">Click lily pads to jump! Avoid the red obstacles!</div>
         </div>
     </div>
 
     <script>
-        const gameArea = document.querySelector('.game-area');
-        const gameWorld = document.getElementById('gameWorld');
-        const water = document.getElementById('water');
         const frog = document.getElementById('frog');
         const jumpCountDisplay = document.getElementById('jumpCount');
+        const gameArea = document.querySelector('.game-area');
         const gameStatus = document.getElementById('gameStatus');
 
         let jumpCount = 0;
         let isJumping = false;
         let gameActive = true;
-        let worldY = 0;
-        const VIEWPORT_HEIGHT = 500;
-        const WORLD_WIDTH = 2000;
+        let targetX = null;
+        let targetY = null;
 
+        // Audio context for sound effects
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
         function playSound(freq, duration) {
             const osc = audioContext.createOscillator();
             const gain = audioContext.createGain();
+
             osc.connect(gain);
             gain.connect(audioContext.destination);
+
             osc.frequency.value = freq;
             osc.type = 'sine';
+
             gain.gain.setValueAtTime(0.3, audioContext.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+
             osc.start(audioContext.currentTime);
             osc.stop(audioContext.currentTime + duration);
         }
@@ -415,12 +411,7 @@
             playSound(200, 0.3);
         }
 
-        function updateCamera(targetWorldY) {
-            worldY = Math.max(0, targetWorldY);
-            gameWorld.style.transform = `translateY(${-worldY}px)`;
-        }
-
-        function makeJump(targetElement) {
+        function makeJump(targetElement = null) {
             if (isJumping || !gameActive) return;
 
             isJumping = true;
@@ -428,30 +419,38 @@
             jumpCountDisplay.textContent = jumpCount;
             jumpSound();
 
+            if (targetElement) {
+                const rect = targetElement.getBoundingClientRect();
+                const gameRect = gameArea.getBoundingClientRect();
+                targetX = rect.left - gameRect.left + rect.width / 2;
+                targetY = rect.top - gameRect.top + rect.height / 2;
+            }
+
             frog.classList.add('jumping');
 
             setTimeout(() => {
-                const rect = targetElement.getBoundingClientRect();
-                const newWorldY = worldY + rect.top - VIEWPORT_HEIGHT / 2;
-                updateCamera(newWorldY);
-
+                if (targetElement) {
+                    frog.style.left = targetX + 'px';
+                    frog.style.bottom = 'auto';
+                    frog.style.top = targetY - 30 + 'px';
+                }
                 frog.classList.remove('jumping');
                 isJumping = false;
 
                 checkCollisions();
-                generateNewLilyPads();
             }, 600);
         }
 
         function checkCollisions() {
-            const frogScreenY = VIEWPORT_HEIGHT / 2;
-            const obstacles = gameWorld.querySelectorAll('.obstacle');
+            const frogRect = frog.getBoundingClientRect();
+            const obstacles = gameArea.querySelectorAll('.obstacle');
 
             for (let obstacle of obstacles) {
-                const rect = obstacle.getBoundingClientRect();
-                const obstacleWorldY = worldY + rect.top;
-                const distance = Math.abs(obstacleWorldY - (worldY + frogScreenY));
-                if (distance < 60) {
+                const obstacleRect = obstacle.getBoundingClientRect();
+                if (frogRect.left < obstacleRect.right &&
+                    frogRect.right > obstacleRect.left &&
+                    frogRect.top < obstacleRect.bottom &&
+                    frogRect.bottom > obstacleRect.top) {
                     endGame();
                     return;
                 }
@@ -465,67 +464,45 @@
             gameStatus.classList.add('show');
         }
 
-        function generateNewLilyPads() {
-            const existingPads = gameWorld.querySelectorAll('.lily-pad');
-            if (existingPads.length < 15) {
-                for (let i = 0; i < 3; i++) {
-                    const pad = document.createElement('div');
-                    pad.className = 'lily-pad';
-                    const minY = worldY + VIEWPORT_HEIGHT * 0.3 + (i * 120);
-                    pad.style.top = minY + 'px';
-                    pad.style.left = (Math.random() * 60 + 20) + '%';
-                    pad.addEventListener('click', () => makeJump(pad));
-                    gameWorld.appendChild(pad);
-                }
-            }
-        }
-
-        function generateNewObstacles() {
-            const obstacles = gameWorld.querySelectorAll('.obstacle');
-            if (obstacles.length < 8) {
-                for (let i = 0; i < 2; i++) {
-                    const obs = document.createElement('div');
-                    obs.className = 'obstacle';
-                    obs.style.width = '50px';
-                    obs.style.height = '50px';
-                    const minY = worldY + VIEWPORT_HEIGHT + (Math.random() * 200);
-                    obs.style.top = minY + 'px';
-                    obs.style.left = (Math.random() * 70 + 15) + '%';
-                    gameWorld.appendChild(obs);
-                }
-            }
-        }
-
         function restart() {
             gameActive = true;
             jumpCount = 0;
-            worldY = 0;
             jumpCountDisplay.textContent = 0;
+            frog.style.left = '50%';
+            frog.style.bottom = '80px';
+            frog.style.top = 'auto';
+            frog.style.transform = 'translateX(-50%)';
             gameStatus.classList.remove('show');
-            gameWorld.querySelectorAll('.obstacle').forEach(o => o.remove());
-            gameWorld.querySelectorAll('.lily-pad').forEach(p => p.remove());
-            updateCamera(0);
-
-            // Generate initial lily pads in visible area
-            for (let i = 0; i < 8; i++) {
-                const pad = document.createElement('div');
-                pad.className = 'lily-pad';
-                pad.style.top = (100 + i * 120) + 'px';
-                pad.style.left = (Math.random() * 60 + 20) + '%';
-                pad.addEventListener('click', () => makeJump(pad));
-                gameWorld.appendChild(pad);
-            }
-
-            generateNewObstacles();
+            gameArea.querySelectorAll('.obstacle').forEach(o => o.remove());
+            spawnObstacles();
         }
 
-        restart();
+        function spawnObstacles() {
+            for (let i = 0; i < 3; i++) {
+                const obstacle = document.createElement('div');
+                obstacle.className = 'obstacle';
+                obstacle.style.width = '50px';
+                obstacle.style.height = '50px';
+                obstacle.style.top = (100 + Math.random() * 200) + 'px';
+                obstacle.style.left = (Math.random() * 80 + 10) + '%';
+                gameArea.appendChild(obstacle);
+            }
+        }
+
+        // Lily pads
+        for (let i = 0; i < 5; i++) {
+            const lilyPad = document.createElement('div');
+            lilyPad.className = 'lily-pad';
+            lilyPad.style.top = (80 + Math.random() * 150) + 'px';
+            lilyPad.style.left = (Math.random() * 80 + 10) + '%';
+            lilyPad.addEventListener('click', () => makeJump(lilyPad));
+            gameArea.appendChild(lilyPad);
+        }
+
+        frog.addEventListener('click', () => makeJump());
         gameStatus.addEventListener('click', restart);
 
-        setInterval(() => {
-            generateNewLilyPads();
-            generateNewObstacles();
-        }, 500);
+        spawnObstacles();
     </script>
 </body>
 </html>
