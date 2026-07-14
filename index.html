@@ -50,47 +50,57 @@
             width: 100%;
             height: 100%;
             background: linear-gradient(180deg,
-                #4a90a4 0%,
-                #2d6a7b 25%,
-                #1f4d5c 50%,
-                #2d6a7b 75%,
-                #4a90a4 100%);
+                #3b7fa1 0%,
+                #1e5a7d 20%,
+                #0d4a6f 40%,
+                #0a3d5c 60%,
+                #1e5a7d 80%,
+                #3b7fa1 100%);
             overflow: hidden;
         }
 
         .water::before {
             content: '';
             position: absolute;
-            width: 200%;
+            width: 300%;
             height: 100%;
             background:
-                radial-gradient(circle at 20% 40%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 60% 20%, rgba(255, 255, 255, 0.25) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.2) 0%, transparent 50%);
-            animation: ripple 6s ease-in-out infinite;
+                radial-gradient(circle at 10% 30%, rgba(255, 255, 255, 0.4) 0%, transparent 30%),
+                radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.3) 0%, transparent 35%),
+                radial-gradient(circle at 80% 40%, rgba(255, 255, 255, 0.35) 0%, transparent 32%),
+                radial-gradient(circle at 25% 70%, rgba(255, 255, 255, 0.25) 0%, transparent 28%),
+                radial-gradient(circle at 65% 85%, rgba(255, 255, 255, 0.3) 0%, transparent 30%);
+            animation: ripple 4s ease-in-out infinite;
         }
 
         .water::after {
             content: '';
             position: absolute;
-            width: 200%;
+            width: 300%;
             height: 100%;
             background:
-                radial-gradient(circle at 40% 60%, rgba(255, 255, 255, 0.25) 0%, transparent 60%),
-                radial-gradient(circle at 70% 40%, rgba(255, 255, 255, 0.2) 0%, transparent 60%),
-                radial-gradient(circle at 30% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
-            animation: ripple 8s ease-in-out infinite reverse;
+                radial-gradient(circle at 35% 50%, rgba(255, 255, 255, 0.35) 0%, transparent 35%),
+                radial-gradient(circle at 70% 25%, rgba(255, 255, 255, 0.25) 0%, transparent 32%),
+                radial-gradient(circle at 15% 75%, rgba(255, 255, 255, 0.3) 0%, transparent 30%),
+                radial-gradient(circle at 85% 60%, rgba(255, 255, 255, 0.28) 0%, transparent 34%);
+            animation: ripple 6s ease-in-out infinite reverse;
         }
 
         @keyframes ripple {
             0% {
-                transform: scale(1) translateY(0);
+                transform: translateX(0) translateY(0);
+            }
+            25% {
+                transform: translateX(-15px) translateY(-5px);
             }
             50% {
-                transform: scale(1.1) translateY(2px);
+                transform: translateX(-30px) translateY(0);
+            }
+            75% {
+                transform: translateX(-15px) translateY(5px);
             }
             100% {
-                transform: scale(1) translateY(0);
+                transform: translateX(0) translateY(0);
             }
         }
 
